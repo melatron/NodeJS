@@ -48,10 +48,11 @@ var canvasTriangles = (function () {
         this.y = y;
     }
 
-    function Triangle(a, b, c) {
+    function Triangle(a, b, c, color) {
         this.A = a;
         this.B = b;
         this.C = c;
+        this.color = color;
     }
 
     Triangle.prototype.calculateArea = function () {
@@ -69,6 +70,27 @@ var canvasTriangles = (function () {
         var centerX = (this.A.x + this.B.x + this.C.x) / 3,
             centerY = (this.A.y + this.B.y + this.C.y) / 3
         return new Point(centerX, centerY);
+    }
+
+    Triangle.prototype.drawTriangle = function () {
+        console.log(this, JSON.stringify(this));
+        console.log('-------------------------------');
+        console.log(JSON.stringify(triangleContainer));
+
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.moveTo(this.A.x, this.A.y);
+        ctx.lineTo(this.B.x, this.B.y);
+        ctx.lineTo(this.C.x, this.C.y);
+        ctx.fill();
+
+        var center = this.getCenter(),
+            area = this.calculateArea(),
+            temp = currentColor;
+
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillText(area, center.x, center.y);
+        ctx.fillStyle = currentColor;
     }
 
     function clearCanvas() {
@@ -110,9 +132,10 @@ var canvasTriangles = (function () {
             if (clickCounter <= 3) {
                 pointArray.push(new Point(cords.x, cords.y));
                 if (clickCounter === 3) {
-                    triangle = new Triangle(pointArray[0], pointArray[1], pointArray[2]);
+                    triangle = new Triangle(pointArray[0], pointArray[1], pointArray[2], currentColor);
+                    console.log('Created Triangle:  ', triangle);
                     triangleContainer.push(triangle);
-                    drawTriangle(triangle);
+                    triangle.drawTriangle();
                     pointArray = [];
                     clickCounter = 0;
                 }
@@ -127,34 +150,15 @@ var canvasTriangles = (function () {
             //loadFromLocalStorage();
         });
 
-        $('#load-triangles').off('clicl').on('click', function () {
+        $('#load-triangles').off('click').on('click', function () {
             var triangles = JSON.parse($('#triangle-selector').val()),
                 current = {};
             for (var triangle in triangles) {
-                current = new Triangle(triangles[triangle].A, triangles[triangle].B, triangles[triangle].C);
+                current = new Triangle(triangles[triangle].A, triangles[triangle].B, triangles[triangle].C, triangles[triangle].color);
                 triangleContainer.push(current);
-                drawTriangle(current);
+                current.drawTriangle();
             };
         });
-    }
-
-    function drawTriangle(triangle) {
-        console.log(triangle, JSON.stringify(triangle));
-        console.log('-------------------------------');
-        console.log(JSON.stringify(triangleContainer));
-        ctx.beginPath();
-        ctx.moveTo(triangle.A.x, triangle.A.y);
-        ctx.lineTo(triangle.B.x, triangle.B.y);
-        ctx.lineTo(triangle.C.x, triangle.C.y);
-        ctx.fill();
-
-        var center = triangle.getCenter(),
-            area = triangle.calculateArea(),
-            temp = currentColor;
-
-        ctx.fillStyle = '#FFFFFF';
-        ctx.fillText(area, center.x, center.y);
-        ctx.fillStyle = currentColor;
     }
 
     return {
