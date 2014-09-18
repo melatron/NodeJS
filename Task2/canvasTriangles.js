@@ -108,8 +108,8 @@ var canvasTriangles = (function () {
     function loadFromLocalStorage() {
         clearCanvas();
         console.log('Loading triangles after clearing canvas.');
-        var select = $('#triangle-selector');
-        console.log(select);
+        var select = $('#triangle-selector').html('');
+
         for (var save in localStorage) {
             select.append(new Option(save, localStorage[save]));
         }
@@ -147,10 +147,11 @@ var canvasTriangles = (function () {
         $('#save-triangles').off('click').on('click', function () {
             var name = prompt('Write your save name', 'Pencho');
             localStorage.setItem(name, JSON.stringify(triangleContainer));
-            //loadFromLocalStorage();
+            loadFromLocalStorage();
         });
 
         $('#load-triangles').off('click').on('click', function () {
+            clearCanvas();
             var triangles = JSON.parse($('#triangle-selector').val()),
                 current = {};
             for (var triangle in triangles) {
