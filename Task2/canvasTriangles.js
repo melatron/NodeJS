@@ -84,6 +84,10 @@ var canvasTriangles = (function () {
         ctx.lineTo(this.C.x, this.C.y);
         ctx.fill();
 
+        drawPoint(this.A.x, this.A.y);
+        drawPoint(this.B.x, this.B.y);
+        drawPoint(this.C.x, this.C.y);
+
         var center = this.getCenter(),
             area = this.calculateArea(),
             temp = currentColor;
@@ -91,6 +95,13 @@ var canvasTriangles = (function () {
         ctx.fillStyle = '#FFFFFF';
         ctx.fillText(area, center.x, center.y);
         ctx.fillStyle = currentColor;
+    }
+
+    function drawPoint(x, y) {
+        ctx.beginPath();
+        ctx.fillStyle = '#000000';
+        ctx.arc(x, y, 2, 0, 2 * Math.PI, true);
+        ctx.fill();
     }
 
     function clearCanvas() {
@@ -127,6 +138,8 @@ var canvasTriangles = (function () {
         $('#canvas').off('click').on('click', function (e) {
             var cords = canvas.relMouseCoords(e),
                 triangle;
+
+            drawPoint(cords.x, cords.y);
 
             clickCounter++;
             if (clickCounter <= 3) {
