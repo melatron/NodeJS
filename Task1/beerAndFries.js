@@ -2,10 +2,11 @@
     "use strict";
     function calcScore(sortedBeers, sortedFries) {
         var i,
-                beersAmount = sortedBeers.length,
-                friesAmount = sortedFries.length,
-                length = beersAmount < friesAmount ? beersAmount : friesAmount,
-                result = 0;
+            beersAmount = sortedBeers.length,
+            friesAmount = sortedFries.length,
+            length = beersAmount < friesAmount ? beersAmount : friesAmount,
+            result = 0;
+
         for (i = 0; i < length; i++) {
             result += sortedBeers[i].score * sortedFries[i].score;
         }
@@ -22,7 +23,11 @@
     }
 
     exports.beerAndFries = function beerAndFries(items) {
-        var beerContainer = items.filter(function (item) {
+        var items = items.sort(function (firstItem, secondItem) {
+            return secondItem.score - firstItem.score;
+        }),
+
+            beerContainer = items.filter(function (item) {
             if (item) {
                 return item.type === 'beer';
             }
@@ -31,14 +36,6 @@
                 if (item) {
                     return item.type === 'fries';
                 }
-        });
-
-        beerContainer.sort(function (firstItem, secondItem) {
-            return secondItem.score - firstItem.score;
-        });
-
-        friesContainer.sort(function (firstItem, secondItem) {
-            return secondItem.score - firstItem.score;
         });
 
         return calcScore(beerContainer, friesContainer);
