@@ -68,7 +68,9 @@ Db.prototype.getById = function(id, done) {
         if(err){
             return done(err);
         }
-        var item = findById(id, data);
+        var obj = findById(id, data),
+            item = obj ? obj.item : null;
+
         if(!item) {
             done('Item not found');
         }
@@ -82,9 +84,27 @@ Db.prototype.getById = function(id, done) {
  * @param item - item that will update the existing item. Id is preserved.
  * @param done
  */
-Db.prototype.updateById = function(id, item, done){
+Db.prototype.updateById = function (id, item, done) {
+    var self = this;
+    this.readItems(function (err, data) {
+        if (err) {
+            return done(err);
+        }
+        var obj = findById(id, data),
+            currentIndex = obj ? obj.index : null;
+
+        if (currentIndex) {
+            item.id = item.id || uuid.v1();
+            data[currentIndex] = item;
+        }
+        self.writeItems(data, function (err) {
+            if (err) {
+                return done(err);
+            }
+            done(null, item);
+        });
+    });
     //See Db.prototype.getById
-    done('Method updateById in Db.js not implemented');
 };
 
 /**
@@ -157,7 +177,7 @@ Db.prototype.clear = function(done){
 var findById = function(id, data) {
     for(var i = 0;i < data.length;i++){
         if(data[i].id === id){
-            return data[i];
+            return { item: data[i], index: i };
         }
     }
     return null;

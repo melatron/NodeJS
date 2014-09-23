@@ -92,7 +92,16 @@ function setupRoutes(app) {
             }
          with a status code of 404.
          */
-        next('routing.js: "Update by id" route handler not implemented');
+        db.updateById(id, item, function (err) {
+            if (err) {
+                next(err);
+            } else {
+                res.status(200).send({
+                    Result: item
+                });
+            }
+        });
+        //next('routing.js: "Update by id" route handler not implemented');
     });
 
     app.delete('/db', function (req, res, next) {
