@@ -1,5 +1,4 @@
-﻿
-var canvasTriangles = (function () {
+﻿var canvasTriangles = (function () {
     'use strict';
     var self = {},
         canvas,
