@@ -36,7 +36,7 @@ Db.prototype.addItem = function(item, done){
         }
         item.id = item.id || uuid.v1(); //use the id supplied by the user or generate a new one.
         if(findById(item.id, data)) {
-            return done('Invalid item id. If you supply an id for the item it must be unique.');
+            return done('Item with the same id already exists');
         }
         data.push(item);
         self.writeItems(data, function(err) {
@@ -91,11 +91,14 @@ Db.prototype.updateById = function (id, item, done) {
             return done(err);
         }
         var obj = findById(id, data),
-            currentIndex = obj ? obj.index : null;
+            currentIndex;
 
-        if (currentIndex) {
-            item.id = item.id || uuid.v1();
+        if (obj) {
+            currentIndex = obj.index;
+            item.id = data[currentIndex].id || uuid.v1();
             data[currentIndex] = item;
+        } else {
+            return done('Item not found');
         }
         self.writeItems(data, function (err) {
             if (err) {
@@ -113,7 +116,29 @@ Db.prototype.updateById = function (id, item, done) {
  * @param done
  */
 Db.prototype.deleteById = function(id, done){
-    done('Method deleteById in Db.js not implemented');
+    var self = this;
+    
+    this.readItems(function (err, data) {
+        if (err) {
+            return done(err);
+        }
+        var obj = findById(id, data),
+            currentIndex;
+
+        if (obj) {
+            currentIndex = obj.index;
+            data.splice(currentIndex, 1);
+            console.log(data);
+        } else {
+            return done('Item not found');
+        }
+        self.writeItems(data, function (err) {
+            if (err) {
+                return done(err);
+            }
+            done(null, obj.item);
+        });
+    });
 };
 
 /**
@@ -121,7 +146,19 @@ Db.prototype.deleteById = function(id, done){
  * @param done - done(err, count)
  */
 Db.prototype.deleteAll = function(done){
-    done('Method deleteAll in Db.js not implemented');
+    var self = this;
+    this.readItems(function (err, data) {
+        if (err) {
+            return done(err);
+        }
+       
+        self.writeItems([], function (err) {
+            if (err) {
+                return done(err);
+            }
+            done(null, data.length);
+        });
+    });
 };
 
 /**
